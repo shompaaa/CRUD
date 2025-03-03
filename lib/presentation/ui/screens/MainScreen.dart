@@ -1,3 +1,4 @@
+import 'package:crud_app/utils/ProductController.dart';
 import 'package:flutter/material.dart';
 
 class MainScreen extends StatefulWidget {
@@ -8,12 +9,13 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-  TextEditingController productNameController = TextEditingController();
-  TextEditingController productImageController = TextEditingController();
-  TextEditingController productQtyController = TextEditingController();
-  TextEditingController productUnitPriceController = TextEditingController();
-  TextEditingController productTotalPriceController = TextEditingController();
+  final ProductController productController = ProductController();
   void productDialog() {
+    TextEditingController productNameController = TextEditingController();
+    TextEditingController productImageController = TextEditingController();
+    TextEditingController productQtyController = TextEditingController();
+    TextEditingController productUnitPriceController = TextEditingController();
+    TextEditingController productTotalPriceController = TextEditingController();
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -78,6 +80,19 @@ class _MainScreenState extends State<MainScreen> {
             ));
   }
 
+  Future<void> fetchData()async{
+    await productController.fetchProducts();
+    setState(() {
+    });
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -92,24 +107,22 @@ class _MainScreenState extends State<MainScreen> {
       body: Padding(
         padding: const EdgeInsets.all(8.0),
         child: ListView.builder(
-            itemCount: 10,
+            itemCount: productController.products.length,
             itemBuilder: (context, index) {
+              var product = productController.products[index];
               return Card(
                 margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(15)),
                 elevation: 4,
                 child: ListTile(
-                  leading: Icon(
-                    Icons.image,
-                    size: 50,
-                  ),
+                  leading: Image.network(product['Img'],height: 50,width: 50,fit: BoxFit.cover,),
                   title: Text(
-                    'Iphone 16',
+                    product['ProductName'],
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
                   ),
                   subtitle: Text(
-                    'Price: \$500 | Qty: 20',
+                    'Price: \$${product['UnitPrice']} | Qty: ${product['Qty']}',
                     style: TextStyle(
                       fontSize: 19,
                     ),

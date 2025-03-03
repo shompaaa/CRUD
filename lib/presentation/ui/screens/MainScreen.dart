@@ -68,7 +68,18 @@ class _MainScreenState extends State<MainScreen> {
                             style: TextStyle(fontSize: 20),
                           )),
                       TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            setState(() {
+                              productController.createProducts(
+                                  productNameController.text,
+                                  productImageController.text,
+                                  int.parse(productQtyController.text),
+                                  int.parse(productUnitPriceController.text),
+                                  int.parse(productTotalPriceController.text));
+                              fetchData();
+                              Navigator.pop(context);
+                            });
+                          },
                           child: Text(
                             'Add',
                             style: TextStyle(fontSize: 20),
@@ -80,10 +91,9 @@ class _MainScreenState extends State<MainScreen> {
             ));
   }
 
-  Future<void> fetchData()async{
+  Future<void> fetchData() async {
     await productController.fetchProducts();
-    setState(() {
-    });
+    setState(() {});
   }
 
   @override
@@ -116,7 +126,12 @@ class _MainScreenState extends State<MainScreen> {
                     borderRadius: BorderRadius.circular(15)),
                 elevation: 4,
                 child: ListTile(
-                  leading: Image.network(product['Img'],height: 50,width: 50,fit: BoxFit.cover,),
+                  // leading: Image.network(
+                  //   product['Img'],
+                  //   height: 50,
+                  //   width: 50,
+                  //   fit: BoxFit.cover,
+                  // ),
                   title: Text(
                     product['ProductName'],
                     style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),

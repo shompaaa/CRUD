@@ -1,4 +1,5 @@
 import 'package:crud_app/data/models/productModel.dart';
+import 'package:crud_app/presentation/ui/widgets/ProductCard.dart';
 import 'package:crud_app/utils/ProductController.dart';
 import 'package:flutter/material.dart';
 
@@ -26,9 +27,9 @@ class _MainScreenState extends State<MainScreen> {
 
     productNameController.text = name ?? '';
     productImageController.text = img ?? '';
-    productQtyController.text = qty.toString() ?? '';
-    productUnitPriceController.text = unitPrice.toString() ?? '';
-    productTotalPriceController.text = totalPrice.toString() ?? '';
+    productQtyController.text = qty !=null ? qty.toString() : '';
+    productUnitPriceController.text = unitPrice != null ? unitPrice.toString() : '';
+    productTotalPriceController.text = totalPrice != null ? totalPrice.toString() : '';
 
     showDialog(
         context: context,
@@ -131,6 +132,7 @@ class _MainScreenState extends State<MainScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey.shade300,
       appBar: AppBar(
         title: Text(
           'CRUD Application',
@@ -141,98 +143,63 @@ class _MainScreenState extends State<MainScreen> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: ListView.builder(
+        child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 10,
+                childAspectRatio: 0.8),
             itemCount: productController.products.length,
             itemBuilder: (context, index) {
               var product = productController.products[index];
-              return Card(
-                margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15)),
-                elevation: 4,
-                child: ListTile(
-                  // leading: Image.network(
-                  //   product.img,
-                  //   height: 50,
-                  //   width: 50,
-                  //   fit: BoxFit.cover,
-                  // ),
-                  title: Text(
-                    product.productName.toString(),
-                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              return ProductCard(
+                  product: product,
+                  onEdit: () => productDialog(
+                    id: product.sId,
+                    name: product.productName,
+                    img: product.img,
+                    qty: product.qty,
+                    unitPrice: product.unitPrice,
+                    totalPrice: product.totalPrice,
                   ),
-                  subtitle: Text(
-                    'Price: \$${product.unitPrice} | Qty: ${product.qty}',
-                    style: TextStyle(
-                      fontSize: 19,
-                    ),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                          onPressed: () => productDialog(
-                                id: product.sId,
-                                name: product.productName,
-                                img: product.img,
-                                qty: product.qty,
-                                unitPrice: product.unitPrice,
-                                totalPrice: product.totalPrice,
+                  onDelete: () {
+                    productController
+                        .deleteProduct(product.sId.toString())
+                        .then((value) {
+                      if (value) {
+                        setState(() {
+                          fetchData();
+                        });
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'successfully deleted',
+                              style: TextStyle(
+                                fontSize: 19,
+                                color: Colors.green,
                               ),
-                          icon: Icon(
-                            Icons.edit,
-                            size: 30,
-                          )),
-                      SizedBox(
-                        width: 10,
-                      ),
-                      IconButton(
-                          onPressed: () {
-                            productController
-                                .deleteProduct(product.sId.toString())
-                                .then((value) {
-                              if (value) {
-                                setState(() {
-                                  fetchData();
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'successfully deleted',
-                                      style: TextStyle(
-                                          fontSize: 19,
-                                          color: Colors.green,
-                                          ),
-                                    ),
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
-                              }else{
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(
-                                      'something went wrong! try again later',
-                                      style: TextStyle(
-                                        fontSize: 19,
-                                        color: Colors.red,
-                                      ),
-                                    ),
-                                    duration: Duration(seconds: 2),
-                                  ),
-                                );
-                              }
-                            });
-                          },
-                          icon: Icon(
-                            Icons.delete,
-                            size: 30,
-                            color: Colors.red,
-                          ))
-                    ],
-                  ),
-                ),
-              );
+                            ),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }else{
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              'something went wrong! try again later',
+                              style: TextStyle(
+                                fontSize: 19,
+                                color: Colors.red,
+                              ),
+                            ),
+                            duration: Duration(seconds: 2),
+                          ),
+                        );
+                      }
+                    });
+              });
             }),
+
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.indigoAccent,

@@ -33,7 +33,7 @@ class ProductController{
     );
 
     if(response.statusCode == 201){
-      fetchProducts();
+      await fetchProducts();
     }
   }
 
@@ -51,7 +51,7 @@ class ProductController{
     );
 
     if(response.statusCode == 201){
-      fetchProducts();
+      await fetchProducts();
     }
   }
 

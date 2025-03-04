@@ -83,7 +83,7 @@ class _MainScreenState extends State<MainScreen> {
                             style: TextStyle(fontSize: 20),
                           )),
                       TextButton(
-                          onPressed: () {
+                          onPressed: () async {
                             if (id == null) {
                               productController.createProducts(
                                   productNameController.text,
@@ -101,10 +101,11 @@ class _MainScreenState extends State<MainScreen> {
                                 int.parse(productTotalPriceController.text),
                               );
                             }
-                            fetchData();
-                            Navigator.pop(context);
 
+                            await fetchData();
+                            Navigator.pop(context);
                             setState(() {});
+
                           },
                           child: Text(
                             id == null ? 'Add' : 'Update',
